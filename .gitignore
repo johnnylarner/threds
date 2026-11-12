@@ -24,3 +24,7 @@ rustc-ice-*.txt
 #.idea/
 
 /.audit/
+
+# Generated project skill links
+.agents/skills/axiom-*
+.agents/skills/.skillshare-manifest.json

@@ -1,0 +1,340 @@
+{
+  "version": 1,
+  "skills": {
+    "axiom-accessibility": {
+      "source": "github.com/CharlesWiltgen/Axiom/axiom-codex/skills/axiom-accessibility",
+      "commit": "ffafd3b3e0dbaaa60b753ca4a835ae6603b873e1",
+      "tree_hash": "73c2fbec3978c6e1eac3c90a768f2116f57192ed"
+    },
+    "axiom-analyze-crash": {
+      "source": "github.com/CharlesWiltgen/Axiom/axiom-codex/skills/axiom-analyze-crash",
+      "commit": "ffafd3b3e0dbaaa60b753ca4a835ae6603b873e1",
+      "tree_hash": "e5a4f3fdeba6d1de9eacf2cbea17b792f5a1d926"
+    },
+    "axiom-analyze-swift-performance": {
+      "source": "github.com/CharlesWiltgen/Axiom/axiom-codex/skills/axiom-analyze-swift-performance",
+      "commit": "ffafd3b3e0dbaaa60b753ca4a835ae6603b873e1",
+      "tree_hash": "cab5d081525d7cebae6aa4189e7dde4dd2105d65"
+    },
+    "axiom-analyze-swiftui-performance": {
+      "source": "github.com/CharlesWiltgen/Axiom/axiom-codex/skills/axiom-analyze-swiftui-performance",
+      "commit": "ffafd3b3e0dbaaa60b753ca4a835ae6603b873e1",
+      "tree_hash": "180aa20f615afe1e5e1f77e8ad65c5ccb3ada04d"
+    },
+    "axiom-analyze-test-failures": {
+      "source": "github.com/CharlesWiltgen/Axiom/axiom-codex/skills/axiom-analyze-test-failures",
+      "commit": "ffafd3b3e0dbaaa60b753ca4a835ae6603b873e1",
+      "tree_hash": "600b391ebd4668a19e49adc671a94ee9a9e8f3fb"
+    },
+    "axiom-analyze-triage": {
+      "source": "github.com/CharlesWiltgen/Axiom/axiom-codex/skills/axiom-analyze-triage",
+      "commit": "ffafd3b3e0dbaaa60b753ca4a835ae6603b873e1",
+      "tree_hash": "2fc3e9f59c1ef37c1a24ac33fc09d2f725d08a14"
+    },
+    "axiom-apple-docs": {
+      "source": "github.com/CharlesWiltgen/Axiom/axiom-codex/skills/axiom-apple-docs",
+      "commit": "ffafd3b3e0dbaaa60b753ca4a835ae6603b873e1",
+      "tree_hash": "5fac1fdb44619c488e01b0226823b512d15a29bd"
+    },
+    "axiom-audit-accessibility": {
+      "source": "github.com/CharlesWiltgen/Axiom/axiom-codex/skills/axiom-audit-accessibility",
+      "commit": "ffafd3b3e0dbaaa60b753ca4a835ae6603b873e1",
+      "tree_hash": "3169ca80172094c4457c771c04bba6dd66638cc7"
+    },
+    "axiom-audit-camera": {
+      "source": "github.com/CharlesWiltgen/Axiom/axiom-codex/skills/axiom-audit-camera",
+      "commit": "ffafd3b3e0dbaaa60b753ca4a835ae6603b873e1",
+      "tree_hash": "23a5cee220209dcaca3631dcd5d8773013d99003"
+    },
+    "axiom-audit-codable": {
+      "source": "github.com/CharlesWiltgen/Axiom/axiom-codex/skills/axiom-audit-codable",
+      "commit": "ffafd3b3e0dbaaa60b753ca4a835ae6603b873e1",
+      "tree_hash": "55539e112523a2928bc1bee65eae43f6e51372c9"
+    },
+    "axiom-audit-concurrency": {
+      "source": "github.com/CharlesWiltgen/Axiom/axiom-codex/skills/axiom-audit-concurrency",
+      "commit": "ffafd3b3e0dbaaa60b753ca4a835ae6603b873e1",
+      "tree_hash": "1e75bb45c793718b1ad7789c7c1187acd66bd0c8"
+    },
+    "axiom-audit-core-data": {
+      "source": "github.com/CharlesWiltgen/Axiom/axiom-codex/skills/axiom-audit-core-data",
+      "commit": "ffafd3b3e0dbaaa60b753ca4a835ae6603b873e1",
+      "tree_hash": "efaa7ca67e5b67d0b832790b485dff15c57a6258"
+    },
+    "axiom-audit-database-schema": {
+      "source": "github.com/CharlesWiltgen/Axiom/axiom-codex/skills/axiom-audit-database-schema",
+      "commit": "ffafd3b3e0dbaaa60b753ca4a835ae6603b873e1",
+      "tree_hash": "1bd3ee9091db6b9959c3ea7edc3560da7a07dc98"
+    },
+    "axiom-audit-energy": {
+      "source": "github.com/CharlesWiltgen/Axiom/axiom-codex/skills/axiom-audit-energy",
+      "commit": "ffafd3b3e0dbaaa60b753ca4a835ae6603b873e1",
+      "tree_hash": "da211c96ce0a16dbbd3568f9795609b5dc77da68"
+    },
+    "axiom-audit-grdb-performance": {
+      "source": "github.com/CharlesWiltgen/Axiom/axiom-codex/skills/axiom-audit-grdb-performance",
+      "commit": "ffafd3b3e0dbaaa60b753ca4a835ae6603b873e1",
+      "tree_hash": "62574dce182802a9295d6debb064215f1329177e"
+    },
+    "axiom-audit-iap": {
+      "source": "github.com/CharlesWiltgen/Axiom/axiom-codex/skills/axiom-audit-iap",
+      "commit": "ffafd3b3e0dbaaa60b753ca4a835ae6603b873e1",
+      "tree_hash": "8fbf16c3f829c013d2991b892eee94c924774487"
+    },
+    "axiom-audit-icloud": {
+      "source": "github.com/CharlesWiltgen/Axiom/axiom-codex/skills/axiom-audit-icloud",
+      "commit": "ffafd3b3e0dbaaa60b753ca4a835ae6603b873e1",
+      "tree_hash": "cb20322a400e59e2f70f954b2ab1fb9cf0cefdc3"
+    },
+    "axiom-audit-liquid-glass": {
+      "source": "github.com/CharlesWiltgen/Axiom/axiom-codex/skills/axiom-audit-liquid-glass",
+      "commit": "ffafd3b3e0dbaaa60b753ca4a835ae6603b873e1",
+      "tree_hash": "dd3ebf05a564cc77e3f87db8963040872eb1a8da"
+    },
+    "axiom-audit-memory": {
+      "source": "github.com/CharlesWiltgen/Axiom/axiom-codex/skills/axiom-audit-memory",
+      "commit": "ffafd3b3e0dbaaa60b753ca4a835ae6603b873e1",
+      "tree_hash": "85b990b6dc2d09a0cae97702fac86961f47f430b"
+    },
+    "axiom-audit-networking": {
+      "source": "github.com/CharlesWiltgen/Axiom/axiom-codex/skills/axiom-audit-networking",
+      "commit": "ffafd3b3e0dbaaa60b753ca4a835ae6603b873e1",
+      "tree_hash": "5fc9b52923642a94fd74f784b2ea09db6df04818"
+    },
+    "axiom-audit-resize": {
+      "source": "github.com/CharlesWiltgen/Axiom/axiom-codex/skills/axiom-audit-resize",
+      "commit": "ffafd3b3e0dbaaa60b753ca4a835ae6603b873e1",
+      "tree_hash": "d7a76b38f1883464b9d06f681dcce3d5af7ebfd9"
+    },
+    "axiom-audit-siri-ai": {
+      "source": "github.com/CharlesWiltgen/Axiom/axiom-codex/skills/axiom-audit-siri-ai",
+      "commit": "ffafd3b3e0dbaaa60b753ca4a835ae6603b873e1",
+      "tree_hash": "423d5d3ef3637b88af713e672c7055a35ec0e66a"
+    },
+    "axiom-audit-spritekit": {
+      "source": "github.com/CharlesWiltgen/Axiom/axiom-codex/skills/axiom-audit-spritekit",
+      "commit": "ffafd3b3e0dbaaa60b753ca4a835ae6603b873e1",
+      "tree_hash": "574b7e897ac66aabbdd356b8c9ef0a53631551e1"
+    },
+    "axiom-audit-storage": {
+      "source": "github.com/CharlesWiltgen/Axiom/axiom-codex/skills/axiom-audit-storage",
+      "commit": "ffafd3b3e0dbaaa60b753ca4a835ae6603b873e1",
+      "tree_hash": "392fcd227a4a67a78fee6f528c27f19ed92d3d4c"
+    },
+    "axiom-audit-swiftdata": {
+      "source": "github.com/CharlesWiltgen/Axiom/axiom-codex/skills/axiom-audit-swiftdata",
+      "commit": "ffafd3b3e0dbaaa60b753ca4a835ae6603b873e1",
+      "tree_hash": "de654a59e595a98f6251a2be84be9d720b944611"
+    },
+    "axiom-audit-swiftui-architecture": {
+      "source": "github.com/CharlesWiltgen/Axiom/axiom-codex/skills/axiom-audit-swiftui-architecture",
+      "commit": "ffafd3b3e0dbaaa60b753ca4a835ae6603b873e1",
+      "tree_hash": "9e4e515b7d6595fbc182c1d9663406ea6ef3bf7a"
+    },
+    "axiom-audit-swiftui-layout": {
+      "source": "github.com/CharlesWiltgen/Axiom/axiom-codex/skills/axiom-audit-swiftui-layout",
+      "commit": "ffafd3b3e0dbaaa60b753ca4a835ae6603b873e1",
+      "tree_hash": "2ae929b8b078e0fdefdeffe48e7dedd23eb523ae"
+    },
+    "axiom-audit-swiftui-nav": {
+      "source": "github.com/CharlesWiltgen/Axiom/axiom-codex/skills/axiom-audit-swiftui-nav",
+      "commit": "ffafd3b3e0dbaaa60b753ca4a835ae6603b873e1",
+      "tree_hash": "cbdd47ce4755c5b0a996744f0059142ef7f2e4c8"
+    },
+    "axiom-audit-testing": {
+      "source": "github.com/CharlesWiltgen/Axiom/axiom-codex/skills/axiom-audit-testing",
+      "commit": "ffafd3b3e0dbaaa60b753ca4a835ae6603b873e1",
+      "tree_hash": "578f9a03496d9acf609e9846dcdf7329120e1c8f"
+    },
+    "axiom-audit-textkit": {
+      "source": "github.com/CharlesWiltgen/Axiom/axiom-codex/skills/axiom-audit-textkit",
+      "commit": "ffafd3b3e0dbaaa60b753ca4a835ae6603b873e1",
+      "tree_hash": "893056c8fc466c8ec540ae2c693c0f2847603161"
+    },
+    "axiom-audit-touch": {
+      "source": "github.com/CharlesWiltgen/Axiom/axiom-codex/skills/axiom-audit-touch",
+      "commit": "ffafd3b3e0dbaaa60b753ca4a835ae6603b873e1",
+      "tree_hash": "f7166eefdae94954de77800ae95196c2175dc14a"
+    },
+    "axiom-audit-ux-flow": {
+      "source": "github.com/CharlesWiltgen/Axiom/axiom-codex/skills/axiom-audit-ux-flow",
+      "commit": "ffafd3b3e0dbaaa60b753ca4a835ae6603b873e1",
+      "tree_hash": "42c1617e3f732d4721af43ad9dc609e3bada18b1"
+    },
+    "axiom-build": {
+      "source": "github.com/CharlesWiltgen/Axiom/axiom-codex/skills/axiom-build",
+      "commit": "ffafd3b3e0dbaaa60b753ca4a835ae6603b873e1",
+      "tree_hash": "184a4c93a16fe403dcb27ecd2a15ba0cd9c4a3c2"
+    },
+    "axiom-concurrency": {
+      "source": "github.com/CharlesWiltgen/Axiom/axiom-codex/skills/axiom-concurrency",
+      "commit": "ffafd3b3e0dbaaa60b753ca4a835ae6603b873e1",
+      "tree_hash": "6f65db8af03fd48a83a4b3d75e4803c7b704530a"
+    },
+    "axiom-data": {
+      "source": "github.com/CharlesWiltgen/Axiom/axiom-codex/skills/axiom-data",
+      "commit": "ffafd3b3e0dbaaa60b753ca4a835ae6603b873e1",
+      "tree_hash": "c519ec1a4bf6869a6bbdf218ff4fd73d7806cd73"
+    },
+    "axiom-debug-tests": {
+      "source": "github.com/CharlesWiltgen/Axiom/axiom-codex/skills/axiom-debug-tests",
+      "commit": "ffafd3b3e0dbaaa60b753ca4a835ae6603b873e1",
+      "tree_hash": "b5b25e3f6d6635d750d70c530d020bfb1fe93940"
+    },
+    "axiom-design": {
+      "source": "github.com/CharlesWiltgen/Axiom/axiom-codex/skills/axiom-design",
+      "commit": "ffafd3b3e0dbaaa60b753ca4a835ae6603b873e1",
+      "tree_hash": "2ce2ffcf805b4317176ae67543921fd87affbbc4"
+    },
+    "axiom-fix-build": {
+      "source": "github.com/CharlesWiltgen/Axiom/axiom-codex/skills/axiom-fix-build",
+      "commit": "ffafd3b3e0dbaaa60b753ca4a835ae6603b873e1",
+      "tree_hash": "5227e5f5a6b53615199830556c880608865d7ff9"
+    },
+    "axiom-games": {
+      "source": "github.com/CharlesWiltgen/Axiom/axiom-codex/skills/axiom-games",
+      "commit": "ffafd3b3e0dbaaa60b753ca4a835ae6603b873e1",
+      "tree_hash": "8c87141c71641a21ee9f64bda0e05b8278bb3b6a"
+    },
+    "axiom-graphics": {
+      "source": "github.com/CharlesWiltgen/Axiom/axiom-codex/skills/axiom-graphics",
+      "commit": "ffafd3b3e0dbaaa60b753ca4a835ae6603b873e1",
+      "tree_hash": "b78ca56e5e7f0a0445a9b625040a3eab32fb224e"
+    },
+    "axiom-health": {
+      "source": "github.com/CharlesWiltgen/Axiom/axiom-codex/skills/axiom-health",
+      "commit": "ffafd3b3e0dbaaa60b753ca4a835ae6603b873e1",
+      "tree_hash": "f837df32c86f6b940237f58150e0a5ff4cea49f5"
+    },
+    "axiom-health-check": {
+      "source": "github.com/CharlesWiltgen/Axiom/axiom-codex/skills/axiom-health-check",
+      "commit": "ffafd3b3e0dbaaa60b753ca4a835ae6603b873e1",
+      "tree_hash": "dc38de1d6dae091e03c49ddb301c7728b35f0307"
+    },
+    "axiom-implement-iap": {
+      "source": "github.com/CharlesWiltgen/Axiom/axiom-codex/skills/axiom-implement-iap",
+      "commit": "ffafd3b3e0dbaaa60b753ca4a835ae6603b873e1",
+      "tree_hash": "2a44384fbc03b0785a408ac00bd5d726fdd7f8c1"
+    },
+    "axiom-integration": {
+      "source": "github.com/CharlesWiltgen/Axiom/axiom-codex/skills/axiom-integration",
+      "commit": "ffafd3b3e0dbaaa60b753ca4a835ae6603b873e1",
+      "tree_hash": "97519fab05c2dc00a02ac11ab6c6cffc528e59fe"
+    },
+    "axiom-location": {
+      "source": "github.com/CharlesWiltgen/Axiom/axiom-codex/skills/axiom-location",
+      "commit": "ffafd3b3e0dbaaa60b753ca4a835ae6603b873e1",
+      "tree_hash": "513581df33bc314d60ee8f5c488268514e292e37"
+    },
+    "axiom-macos": {
+      "source": "github.com/CharlesWiltgen/Axiom/axiom-codex/skills/axiom-macos",
+      "commit": "ffafd3b3e0dbaaa60b753ca4a835ae6603b873e1",
+      "tree_hash": "df553afd336c877531c72eb456aee0428a2908f9"
+    },
+    "axiom-media": {
+      "source": "github.com/CharlesWiltgen/Axiom/axiom-codex/skills/axiom-media",
+      "commit": "ffafd3b3e0dbaaa60b753ca4a835ae6603b873e1",
+      "tree_hash": "4f7e3a8ee9271705b64e920b76c6abdd1a770cb4"
+    },
+    "axiom-modernize": {
+      "source": "github.com/CharlesWiltgen/Axiom/axiom-codex/skills/axiom-modernize",
+      "commit": "ffafd3b3e0dbaaa60b753ca4a835ae6603b873e1",
+      "tree_hash": "dbc93831f2a5bb37b212ea4f2d175b60ca29d4c8"
+    },
+    "axiom-networking": {
+      "source": "github.com/CharlesWiltgen/Axiom/axiom-codex/skills/axiom-networking",
+      "commit": "ffafd3b3e0dbaaa60b753ca4a835ae6603b873e1",
+      "tree_hash": "e9e36f36f0bb50bf60b4b7dbcb5711ff1bcaba54"
+    },
+    "axiom-optimize-build": {
+      "source": "github.com/CharlesWiltgen/Axiom/axiom-codex/skills/axiom-optimize-build",
+      "commit": "ffafd3b3e0dbaaa60b753ca4a835ae6603b873e1",
+      "tree_hash": "6300c234d6062642ee9fbf4ba9cc6bc7b27daacd"
+    },
+    "axiom-payments": {
+      "source": "github.com/CharlesWiltgen/Axiom/axiom-codex/skills/axiom-payments",
+      "commit": "ffafd3b3e0dbaaa60b753ca4a835ae6603b873e1",
+      "tree_hash": "cb03f571a321270dbb88ef54d1349b58520b3cb6"
+    },
+    "axiom-performance": {
+      "source": "github.com/CharlesWiltgen/Axiom/axiom-codex/skills/axiom-performance",
+      "commit": "ffafd3b3e0dbaaa60b753ca4a835ae6603b873e1",
+      "tree_hash": "02df58d3cd22e5fcda0ded454ff4b508d1116f54"
+    },
+    "axiom-profile-performance": {
+      "source": "github.com/CharlesWiltgen/Axiom/axiom-codex/skills/axiom-profile-performance",
+      "commit": "ffafd3b3e0dbaaa60b753ca4a835ae6603b873e1",
+      "tree_hash": "7d928fab26bab4370629ae26c83a39057e1f72eb"
+    },
+    "axiom-resolve-spm": {
+      "source": "github.com/CharlesWiltgen/Axiom/axiom-codex/skills/axiom-resolve-spm",
+      "commit": "ffafd3b3e0dbaaa60b753ca4a835ae6603b873e1",
+      "tree_hash": "93cb5feea34ab6d32a63dd3e390da37fc5e04087"
+    },
+    "axiom-run-tests": {
+      "source": "github.com/CharlesWiltgen/Axiom/axiom-codex/skills/axiom-run-tests",
+      "commit": "ffafd3b3e0dbaaa60b753ca4a835ae6603b873e1",
+      "tree_hash": "ef6f9e3bbe234b546ac7a72bb55c396c7dc6b260"
+    },
+    "axiom-scan-security-privacy": {
+      "source": "github.com/CharlesWiltgen/Axiom/axiom-codex/skills/axiom-scan-security-privacy",
+      "commit": "ffafd3b3e0dbaaa60b753ca4a835ae6603b873e1",
+      "tree_hash": "307754e34180a00326edd1d212b2d39198561d18"
+    },
+    "axiom-swift": {
+      "source": "github.com/CharlesWiltgen/Axiom/axiom-codex/skills/axiom-swift",
+      "commit": "ffafd3b3e0dbaaa60b753ca4a835ae6603b873e1",
+      "tree_hash": "062549f556a424ab4a9491572491494f64e98b3b"
+    },
+    "axiom-swift-simplifier": {
+      "source": "github.com/CharlesWiltgen/Axiom/axiom-codex/skills/axiom-swift-simplifier",
+      "commit": "ffafd3b3e0dbaaa60b753ca4a835ae6603b873e1",
+      "tree_hash": "eacd3a2c80fd926d7c04dcfbf4981a9febd5b109"
+    },
+    "axiom-swiftui": {
+      "source": "github.com/CharlesWiltgen/Axiom/axiom-codex/skills/axiom-swiftui",
+      "commit": "ffafd3b3e0dbaaa60b753ca4a835ae6603b873e1",
+      "tree_hash": "0772aac2fe0ba70915f25be0ab4ce6e050b27696"
+    },
+    "axiom-test-simulator": {
+      "source": "github.com/CharlesWiltgen/Axiom/axiom-codex/skills/axiom-test-simulator",
+      "commit": "ffafd3b3e0dbaaa60b753ca4a835ae6603b873e1",
+      "tree_hash": "f94c68fd4b6e610705835d3aec1dc087f6a8212c"
+    },
+    "axiom-testing": {
+      "source": "github.com/CharlesWiltgen/Axiom/axiom-codex/skills/axiom-testing",
+      "commit": "ffafd3b3e0dbaaa60b753ca4a835ae6603b873e1",
+      "tree_hash": "6830b4e3a9da7197ed7f0d31b8b9b170c8a6e312"
+    },
+    "axiom-tools": {
+      "source": "github.com/CharlesWiltgen/Axiom/axiom-codex/skills/axiom-tools",
+      "commit": "ffafd3b3e0dbaaa60b753ca4a835ae6603b873e1",
+      "tree_hash": "ad439c69dc390839dcc71ba8b8c515f2fa174c8a"
+    },
+    "axiom-uikit": {
+      "source": "github.com/CharlesWiltgen/Axiom/axiom-codex/skills/axiom-uikit",
+      "commit": "ffafd3b3e0dbaaa60b753ca4a835ae6603b873e1",
+      "tree_hash": "07c37af4099bc35a8d767b2ff92a8acd4cd98bc1"
+    },
+    "axiom-validate-screenshots": {
+      "source": "github.com/CharlesWiltgen/Axiom/axiom-codex/skills/axiom-validate-screenshots",
+      "commit": "ffafd3b3e0dbaaa60b753ca4a835ae6603b873e1",
+      "tree_hash": "5b83e4d6fdb3dcce7a676847b749cb9bbc5e3310"
+    },
+    "axiom-vision": {
+      "source": "github.com/CharlesWiltgen/Axiom/axiom-codex/skills/axiom-vision",
+      "commit": "ffafd3b3e0dbaaa60b753ca4a835ae6603b873e1",
+      "tree_hash": "eb6a821cd416ab1be57e47f9620dab8fc495c5f6"
+    },
+    "axiom-watchos": {
+      "source": "github.com/CharlesWiltgen/Axiom/axiom-codex/skills/axiom-watchos",
+      "commit": "ffafd3b3e0dbaaa60b753ca4a835ae6603b873e1",
+      "tree_hash": "41c1f94c9f496e3ee60a3a86b6feb4c2a6db681d"
+    },
+    "axiom-xcode-mcp": {
+      "source": "github.com/CharlesWiltgen/Axiom/axiom-codex/skills/axiom-xcode-mcp",
+      "commit": "ffafd3b3e0dbaaa60b753ca4a835ae6603b873e1",
+      "tree_hash": "8c78ad3e0550ba0a7f9c2268a6e1cc1f4b3dbb64"
+    }
+  }
+}

@@ -1,0 +1,148 @@
+# yaml-language-server: $schema=https://raw.githubusercontent.com/runkids/skillshare/main/schemas/project-config.schema.json
+
+targets:
+  - universal
+
+skills:
+  - name: axiom-accessibility
+    source: github.com/CharlesWiltgen/Axiom/axiom-codex/skills/axiom-accessibility
+  - name: axiom-analyze-crash
+    source: github.com/CharlesWiltgen/Axiom/axiom-codex/skills/axiom-analyze-crash
+  - name: axiom-analyze-swift-performance
+    source: github.com/CharlesWiltgen/Axiom/axiom-codex/skills/axiom-analyze-swift-performance
+  - name: axiom-analyze-swiftui-performance
+    source: github.com/CharlesWiltgen/Axiom/axiom-codex/skills/axiom-analyze-swiftui-performance
+  - name: axiom-analyze-test-failures
+    source: github.com/CharlesWiltgen/Axiom/axiom-codex/skills/axiom-analyze-test-failures
+  - name: axiom-analyze-triage
+    source: github.com/CharlesWiltgen/Axiom/axiom-codex/skills/axiom-analyze-triage
+  - name: axiom-apple-docs
+    source: github.com/CharlesWiltgen/Axiom/axiom-codex/skills/axiom-apple-docs
+  - name: axiom-audit-accessibility
+    source: github.com/CharlesWiltgen/Axiom/axiom-codex/skills/axiom-audit-accessibility
+  - name: axiom-audit-camera
+    source: github.com/CharlesWiltgen/Axiom/axiom-codex/skills/axiom-audit-camera
+  - name: axiom-audit-codable
+    source: github.com/CharlesWiltgen/Axiom/axiom-codex/skills/axiom-audit-codable
+  - name: axiom-audit-concurrency
+    source: github.com/CharlesWiltgen/Axiom/axiom-codex/skills/axiom-audit-concurrency
+  - name: axiom-audit-core-data
+    source: github.com/CharlesWiltgen/Axiom/axiom-codex/skills/axiom-audit-core-data
+  - name: axiom-audit-database-schema
+    source: github.com/CharlesWiltgen/Axiom/axiom-codex/skills/axiom-audit-database-schema
+  - name: axiom-audit-energy
+    source: github.com/CharlesWiltgen/Axiom/axiom-codex/skills/axiom-audit-energy
+  - name: axiom-audit-grdb-performance
+    source: github.com/CharlesWiltgen/Axiom/axiom-codex/skills/axiom-audit-grdb-performance
+  - name: axiom-audit-iap
+    source: github.com/CharlesWiltgen/Axiom/axiom-codex/skills/axiom-audit-iap
+  - name: axiom-audit-icloud
+    source: github.com/CharlesWiltgen/Axiom/axiom-codex/skills/axiom-audit-icloud
+  - name: axiom-audit-liquid-glass
+    source: github.com/CharlesWiltgen/Axiom/axiom-codex/skills/axiom-audit-liquid-glass
+  - name: axiom-audit-memory
+    source: github.com/CharlesWiltgen/Axiom/axiom-codex/skills/axiom-audit-memory
+  - name: axiom-audit-networking
+    source: github.com/CharlesWiltgen/Axiom/axiom-codex/skills/axiom-audit-networking
+  - name: axiom-audit-resize
+    source: github.com/CharlesWiltgen/Axiom/axiom-codex/skills/axiom-audit-resize
+  - name: axiom-audit-siri-ai
+    source: github.com/CharlesWiltgen/Axiom/axiom-codex/skills/axiom-audit-siri-ai
+  - name: axiom-audit-spritekit
+    source: github.com/CharlesWiltgen/Axiom/axiom-codex/skills/axiom-audit-spritekit
+  - name: axiom-audit-storage
+    source: github.com/CharlesWiltgen/Axiom/axiom-codex/skills/axiom-audit-storage
+  - name: axiom-audit-swiftdata
+    source: github.com/CharlesWiltgen/Axiom/axiom-codex/skills/axiom-audit-swiftdata
+  - name: axiom-audit-swiftui-architecture
+    source: github.com/CharlesWiltgen/Axiom/axiom-codex/skills/axiom-audit-swiftui-architecture
+  - name: axiom-audit-swiftui-layout
+    source: github.com/CharlesWiltgen/Axiom/axiom-codex/skills/axiom-audit-swiftui-layout
+  - name: axiom-audit-swiftui-nav
+    source: github.com/CharlesWiltgen/Axiom/axiom-codex/skills/axiom-audit-swiftui-nav
+  - name: axiom-audit-testing
+    source: github.com/CharlesWiltgen/Axiom/axiom-codex/skills/axiom-audit-testing
+  - name: axiom-audit-textkit
+    source: github.com/CharlesWiltgen/Axiom/axiom-codex/skills/axiom-audit-textkit
+  - name: axiom-audit-touch
+    source: github.com/CharlesWiltgen/Axiom/axiom-codex/skills/axiom-audit-touch
+  - name: axiom-audit-ux-flow
+    source: github.com/CharlesWiltgen/Axiom/axiom-codex/skills/axiom-audit-ux-flow
+  - name: axiom-build
+    source: github.com/CharlesWiltgen/Axiom/axiom-codex/skills/axiom-build
+  - name: axiom-concurrency
+    source: github.com/CharlesWiltgen/Axiom/axiom-codex/skills/axiom-concurrency
+  - name: axiom-data
+    source: github.com/CharlesWiltgen/Axiom/axiom-codex/skills/axiom-data
+  - name: axiom-debug-tests
+    source: github.com/CharlesWiltgen/Axiom/axiom-codex/skills/axiom-debug-tests
+  - name: axiom-design
+    source: github.com/CharlesWiltgen/Axiom/axiom-codex/skills/axiom-design
+  - name: axiom-fix-build
+    source: github.com/CharlesWiltgen/Axiom/axiom-codex/skills/axiom-fix-build
+  - name: axiom-games
+    source: github.com/CharlesWiltgen/Axiom/axiom-codex/skills/axiom-games
+  - name: axiom-graphics
+    source: github.com/CharlesWiltgen/Axiom/axiom-codex/skills/axiom-graphics
+  - name: axiom-health
+    source: github.com/CharlesWiltgen/Axiom/axiom-codex/skills/axiom-health
+  - name: axiom-health-check
+    source: github.com/CharlesWiltgen/Axiom/axiom-codex/skills/axiom-health-check
+  - name: axiom-implement-iap
+    source: github.com/CharlesWiltgen/Axiom/axiom-codex/skills/axiom-implement-iap
+  - name: axiom-integration
+    source: github.com/CharlesWiltgen/Axiom/axiom-codex/skills/axiom-integration
+  - name: axiom-location
+    source: github.com/CharlesWiltgen/Axiom/axiom-codex/skills/axiom-location
+  - name: axiom-macos
+    source: github.com/CharlesWiltgen/Axiom/axiom-codex/skills/axiom-macos
+  - name: axiom-media
+    source: github.com/CharlesWiltgen/Axiom/axiom-codex/skills/axiom-media
+  - name: axiom-modernize
+    source: github.com/CharlesWiltgen/Axiom/axiom-codex/skills/axiom-modernize
+  - name: axiom-networking
+    source: github.com/CharlesWiltgen/Axiom/axiom-codex/skills/axiom-networking
+  - name: axiom-optimize-build
+    source: github.com/CharlesWiltgen/Axiom/axiom-codex/skills/axiom-optimize-build
+  - name: axiom-payments
+    source: github.com/CharlesWiltgen/Axiom/axiom-codex/skills/axiom-payments
+  - name: axiom-performance
+    source: github.com/CharlesWiltgen/Axiom/axiom-codex/skills/axiom-performance
+  - name: axiom-profile-performance
+    source: github.com/CharlesWiltgen/Axiom/axiom-codex/skills/axiom-profile-performance
+  - name: axiom-resolve-spm
+    source: github.com/CharlesWiltgen/Axiom/axiom-codex/skills/axiom-resolve-spm
+  - name: axiom-run-tests
+    source: github.com/CharlesWiltgen/Axiom/axiom-codex/skills/axiom-run-tests
+  - name: axiom-scan-security-privacy
+    source: github.com/CharlesWiltgen/Axiom/axiom-codex/skills/axiom-scan-security-privacy
+  - name: axiom-swift
+    source: github.com/CharlesWiltgen/Axiom/axiom-codex/skills/axiom-swift
+  - name: axiom-swift-simplifier
+    source: github.com/CharlesWiltgen/Axiom/axiom-codex/skills/axiom-swift-simplifier
+  - name: axiom-swiftui
+    source: github.com/CharlesWiltgen/Axiom/axiom-codex/skills/axiom-swiftui
+  - name: axiom-test-simulator
+    source: github.com/CharlesWiltgen/Axiom/axiom-codex/skills/axiom-test-simulator
+  - name: axiom-testing
+    source: github.com/CharlesWiltgen/Axiom/axiom-codex/skills/axiom-testing
+  - name: axiom-tools
+    source: github.com/CharlesWiltgen/Axiom/axiom-codex/skills/axiom-tools
+  - name: axiom-uikit
+    source: github.com/CharlesWiltgen/Axiom/axiom-codex/skills/axiom-uikit
+  - name: axiom-validate-screenshots
+    source: github.com/CharlesWiltgen/Axiom/axiom-codex/skills/axiom-validate-screenshots
+  - name: axiom-vision
+    source: github.com/CharlesWiltgen/Axiom/axiom-codex/skills/axiom-vision
+  - name: axiom-watchos
+    source: github.com/CharlesWiltgen/Axiom/axiom-codex/skills/axiom-watchos
+  - name: axiom-xcode-mcp
+    source: github.com/CharlesWiltgen/Axiom/axiom-codex/skills/axiom-xcode-mcp
+
+ignore:
+  - .DS_Store
+  - .git/
+  - __pycache__/
+
+audit:
+  block_threshold: CRITICAL
