@@ -1,0 +1,10 @@
+[package]
+name = "threds"
+version = "0.1.0"
+edition = "2024"
+
+[dependencies]
+threds-core = { path = "../core" }
+gpui = { git = "https://github.com/zed-industries/zed.git", rev = "6ceb6fee8738274589b59139df27efc191ec2231", default-features = false }
+gpui_platform = { git = "https://github.com/zed-industries/zed.git", rev = "6ceb6fee8738274589b59139df27efc191ec2231", default-features = false }
+unicode-segmentation = "1.12"
