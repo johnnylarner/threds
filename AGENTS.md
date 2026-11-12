@@ -1,9 +1,9 @@
 # Project summary and structure
 
-Threds is an open-source iOS writing app in feasibility development. GitHub
+Threds is an open-source iOS writing app in early development. GitHub
 issue #6 tracks the accepted MVP and issues #2 through #5 define its sequence.
-Markdown is authoritative. GPUI iOS editing must pass the feasibility gate
-before product implementation. The browser recording skill applies only to
+Markdown is authoritative. The first offline source-editor slice is implemented;
+physical-device feasibility and broader input validation remain pending. The browser recording skill applies only to
 browser workflows; native iOS interaction follows the Simulator section below.
 
 ## Worktree policy
@@ -82,7 +82,7 @@ browser workflows; native iOS interaction follows the Simulator section below.
 - Use full Xcode, not Command Line Tools alone. Check `xcode-select -p`, `xcodebuild -version`, and `xcrun simctl list devices available` before claiming the simulator is available.
 - Install a compatible iOS runtime through Xcode Settings, Components. Use `aarch64-apple-ios-sim` on Apple silicon and `aarch64-apple-ios` for physical devices. Do not confuse simulator success with physical-device validation.
 - Select an explicit simulator UDID from the available-device list. Boot with `xcrun simctl boot <udid>` when necessary, then wait with `xcrun simctl bootstatus <udid> -b`. Avoid ambiguous `booted` targets when multiple devices are running.
-- Build the pinned GPUI revision using its inspected iOS example script until project scripts exist. Read the built bundle's Info.plist for its identifier. Install with `xcrun simctl install <udid> <app>` and launch with `xcrun simctl launch <udid> <bundle-id>`.
+- Follow [the development runbook](docs/development.md) for setup, logs, tests, persistence checks, and evidence. Build with `scripts/build-simulator.sh` and install/launch with `scripts/install-simulator.sh <udid>`. The bundle is `target/simulator/Threds.app`, identifier `dev.threds.app`. Xcode 27.2 uses Device Hub (`com.apple.dt.Devices`); older installations may use Simulator.
 - Use computer use to interact with the Simulator application. Inspect current accessibility state and screenshots before clicking or typing. If needed, choose the desired device window in Simulator. Use coordinates only from a fresh screenshot. `simctl` handles lifecycle and capture, not arbitrary touch input.
 - Capture with `xcrun simctl io <udid> screenshot <audit-dir>/screen.png` or `xcrun simctl io <udid> recordVideo <audit-dir>/workflow.mp4`. Stop recordings cleanly with SIGINT. Keep logs, screenshots, and videos under ignored `.audit/` paths.
 - Verify keyboard entry, Return, backspace, selection, copy/paste, undo, composition, scrolling, keyboard avoidance, and safe areas. Exercise the software keyboard, not only injected text. Record device, runtime, source SHA, command, and observed result.
@@ -99,4 +99,5 @@ browser workflows; native iOS interaction follows the Simulator section below.
 
 ## Native project checks
 
-- This repository currently has no frontend or Cargo application. The frontend commands above apply only if that frontend exists. For the Rust/iOS work, use the actual pinned workspace's build and test commands, simulator interaction, and physical-device checks specified by the active issue. Never report nonexistent commands as passed.
+- Run `cargo fmt --all -- --check`, `cargo test --locked -p threds-core`, and `scripts/build-simulator.sh`. Check the packaged plist and signature as documented in [the runbook](docs/development.md#test-build-and-install). This repository has no frontend, so the npm and Playwright commands above do not apply.
+- Core tests exercise document and filesystem behavior on the host. Check software-keyboard and navigation behavior in the running iOS app separately. Record unobserved interactions as pending. Simulator success does not establish physical-device behavior.
