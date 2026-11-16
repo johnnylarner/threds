@@ -114,13 +114,16 @@ The last command prints the data-container path. Notes are under `Documents/note
 
 Use a fresh synthetic note, such as a heading "Simulator checklist" followed by paragraphs, emoji, and a line wider than the screen. Observe each result before marking it complete.
 
-1. Open the library and tap **+ New**. Type the fixture with the software keyboard. Press Return in the editor and confirm it inserts a new line. Check caret visibility, horizontal scrolling, vertical scrolling, and keyboard safe areas.
+1. Open the library and tap **+ New thred**. Confirm a small local-date heading appears once and the caret starts in the body. Type the fixture with the software keyboard. Press Return and confirm it inserts a new line. Check line wrapping, caret visibility across wraps, vertical scrolling, and keyboard safe areas.
 2. Pause for at least 400 ms and wait for **Saved on device**. Edit again and tap **Done**. Confirm the library shows the updated title and excerpt, then reopen the note and check the text.
 3. Return to the library and enter a matching query in **Search notes**. Confirm the matching note appears. Press the keyboard's Search or Return key. Confirm the keyboard dismisses without adding a new line to the query. Open the result, then clear the query and confirm the full library returns.
 4. Edit the note, immediately background the app, and reopen it. Confirm the change remains. Wait for **Saved on device**, terminate and relaunch with the commands above, and confirm the exact text remains.
-5. Check backspace across lines, long-press selection, selection adjustment, copy, paste, undo, autocorrect, and non-Latin composition. Check light and dark appearance, portrait and landscape, and keyboard dismissal and return.
+5. Select synthetic text and apply bold, italic, strikethrough, and underline. Confirm each visible effect, toggle each off, and check undo restores the source and selection. Repeat at an empty caret, then type emoji. Insert punctuation and confirm the keyboard stays active. Check multiline selection and marked text across wrapped rows.
+6. Check backspace across lines, long-press selection, selection adjustment, copy, paste, undo, autocorrect, and non-Latin composition. Check light and dark appearance, portrait and landscape, and keyboard dismissal and return.
 
-Record the device, runtime, revision, actions, and observed results. User feedback that the basic app looks good does not certify every input workflow above. Keep unobserved checks pending. Physical-device signing and interaction remain deferred. Long source lines scroll horizontally. The app does not wrap or render Markdown, and it does not sync with GitHub.
+Record the device, runtime, revision, actions, and observed results. User feedback that the basic app looks good does not certify every input workflow above. Keep unobserved checks pending. Physical-device installation and launch have been verified; broader device input checks remain pending. Native toolbar interaction and functional review video also remain pending until observed and recorded.
+
+The editor wraps and styles supported inline Markdown while keeping source syntax editable. It uses paired inline HTML when Markdown delimiters would be ambiguous. Unsupported constructs remain source text. The app does not sync with GitHub.
 
 ## Capture review evidence
 
