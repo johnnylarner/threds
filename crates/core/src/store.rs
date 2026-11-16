@@ -311,6 +311,39 @@ mod tests {
         }
     }
     #[test]
+    fn excerpts_exclude_only_the_selected_title_and_keep_source_searchable() {
+        for (source, title, excerpt) in [
+            (
+                "# Heading wins\n\nLatest synthetic writing.",
+                "Heading wins",
+                "Latest synthetic writing.",
+            ),
+            ("First line\nRemaining body", "First line", "Remaining body"),
+            (
+                "Before\n\n## **Heading** `wins`\n\nHeading wins again.",
+                "Heading wins",
+                "Before Heading wins again.",
+            ),
+            ("\u{feff}Café 🙂\r\n===\r\n\r\nBody\r\n", "Café 🙂", "Body"),
+            ("\u{feff}\r\n  Café 🙂  \r\nbody\r\n", "Café 🙂", "body"),
+            ("# Only title", "Only title", ""),
+            ("Only title", "Only title", ""),
+            (" \r\n\t", "Untitled", ""),
+            ("# First\n\n# Second\nBody", "First", "# Second Body"),
+        ] {
+            let summary = Summary::from_source(
+                NoteName("example.md".into()),
+                source,
+                false,
+                SystemTime::UNIX_EPOCH,
+            );
+            assert_eq!(summary.title, title, "source {source:?}");
+            assert_eq!(summary.excerpt, excerpt, "source {source:?}");
+            assert_eq!(summary.source.as_bytes(), source.as_bytes());
+            assert!(summary.matches(source));
+        }
+    }
+    #[test]
     fn exact_bytes_survive_restart_and_existing_names_are_retained() {
         let fixture = Fixture::new();
         let bytes = "\u{feff}# 名称\r\n\r\nA🙂\r\n";
