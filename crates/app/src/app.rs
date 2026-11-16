@@ -281,7 +281,7 @@ impl Render for AppSession {
             .gap_3()
             .text_color(p.text);
         if let Some(note) = &self.active {
-            let title = threds_core::title(note.document.text(), note.name.as_str());
+            let title = threds_core::title(note.document.text());
             let status = match &note.save {
                 SaveState::Saved(_) => "Saved on device",
                 SaveState::Unsaved => "Unsaved",
@@ -456,7 +456,7 @@ impl Render for AppSession {
                         .child(div().text_size(px(19.)).child(row.title))
                         .child(div().mt_1().text_size(px(14.)).text_color(p.muted).child(
                             if row.excerpt.is_empty() {
-                                "Empty note".into()
+                                "No body text".into()
                             } else {
                                 row.excerpt
                             },

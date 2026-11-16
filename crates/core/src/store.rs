@@ -4,6 +4,7 @@ use std::{
     io::{self, Read, Write},
     os::unix::fs::OpenOptionsExt,
     path::{Path, PathBuf},
+    time::SystemTime,
 };
 use uuid::Uuid;
 
@@ -25,14 +26,26 @@ pub struct Summary {
     pub excerpt: String,
     pub source: String,
     pub recovered: bool,
+    pub modified: SystemTime,
 }
 impl Summary {
-    pub fn from_source(name: NoteName, source: &str, recovered: bool) -> Self {
+    pub fn from_source(
+        name: NoteName,
+        source: &str,
+        recovered: bool,
+        modified: SystemTime,
+    ) -> Self {
+        let title = crate::selected_title(source);
+        let (before, after) = title
+            .span
+            .map(|span| (&source[..span.start], &source[span.end..]))
+            .unwrap_or((source, ""));
         Self {
-            title: crate::title(source, name.as_str()),
-            excerpt: source
+            title: title.text,
+            excerpt: before
                 .trim_start_matches('\u{feff}')
                 .split_whitespace()
+                .chain(after.split_whitespace())
                 .collect::<Vec<_>>()
                 .join(" ")
                 .chars()
@@ -41,6 +54,7 @@ impl Summary {
             source: source.into(),
             name,
             recovered,
+            modified,
         }
     }
     pub fn matches(&self, query: &str) -> bool {
@@ -58,6 +72,7 @@ pub struct LoadedNote {
     pub source: String,
     pub origin: LoadOrigin,
     pub recovery_reason: Option<String>,
+    pub modified: SystemTime,
 }
 #[derive(Default)]
 pub struct ScanReport {
@@ -68,21 +83,31 @@ pub struct NoteStore {
     root: PathBuf,
 }
 
-fn regular_bytes(path: &Path) -> io::Result<Vec<u8>> {
-    let mut file = OpenOptions::new()
+fn regular_file(path: &Path) -> io::Result<File> {
+    let file = OpenOptions::new()
         .read(true)
         .custom_flags(libc::O_NOFOLLOW)
         .open(path)?;
     if !file.metadata()?.is_file() {
         return Err(io::Error::other("Not a regular file"));
     }
+    Ok(file)
+}
+fn regular_bytes(path: &Path) -> io::Result<Vec<u8>> {
+    let mut file = regular_file(path)?;
     let mut bytes = Vec::new();
     file.read_to_end(&mut bytes)?;
     Ok(bytes)
 }
+fn source_with_modified(path: &Path) -> io::Result<(String, SystemTime)> {
+    let mut file = regular_file(path)?;
+    let modified = file.metadata()?.modified()?;
+    let mut source = String::new();
+    file.read_to_string(&mut source)?;
+    Ok((source, modified))
+}
 fn source(path: &Path) -> io::Result<String> {
-    String::from_utf8(regular_bytes(path)?)
-        .map_err(|_| io::Error::new(io::ErrorKind::InvalidData, "Markdown is not UTF-8"))
+    source_with_modified(path).map(|(source, _)| source)
 }
 fn directory(path: &Path) -> io::Result<()> {
     match fs::symlink_metadata(path) {
@@ -143,38 +168,39 @@ impl NoteStore {
                     name,
                     &note.source,
                     note.origin == LoadOrigin::Recovery,
+                    note.modified,
                 )),
                 Err(error) => report.problems.push(format!("{}: {error}", name.as_str())),
             }
         }
-        report.notes.sort_by(|a, b| {
-            a.title
-                .to_lowercase()
-                .cmp(&b.title.to_lowercase())
-                .then(a.name.cmp(&b.name))
-        });
+        report
+            .notes
+            .sort_by(|a, b| b.modified.cmp(&a.modified).then(a.name.cmp(&b.name)));
         report
     }
     pub fn load(&self, name: &NoteName) -> io::Result<LoadedNote> {
-        match source(&self.root.join(name.as_str())) {
-            Ok(source) => Ok(LoadedNote {
+        match source_with_modified(&self.root.join(name.as_str())) {
+            Ok((source, modified)) => Ok(LoadedNote {
                 name: name.clone(),
                 source,
                 origin: LoadOrigin::Primary,
                 recovery_reason: None,
+                modified,
             }),
             Err(primary) => {
-                let source =
-                    source(&self.root.join(".recovery").join(name.as_str())).map_err(|backup| {
-                        io::Error::other(format!(
-                            "Could not read note ({primary}) or recovery ({backup})"
-                        ))
-                    })?;
+                let (source, modified) =
+                    source_with_modified(&self.root.join(".recovery").join(name.as_str()))
+                        .map_err(|backup| {
+                            io::Error::other(format!(
+                                "Could not read note ({primary}) or recovery ({backup})"
+                            ))
+                        })?;
                 Ok(LoadedNote {
                     name: name.clone(),
                     source,
                     origin: LoadOrigin::Recovery,
                     recovery_reason: Some(primary.to_string()),
+                    modified,
                 })
             }
         }
@@ -291,6 +317,39 @@ mod tests {
         }
     }
     #[test]
+    fn excerpts_exclude_only_the_selected_title_and_keep_source_searchable() {
+        for (source, title, excerpt) in [
+            (
+                "# Heading wins\n\nLatest synthetic writing.",
+                "Heading wins",
+                "Latest synthetic writing.",
+            ),
+            ("First line\nRemaining body", "First line", "Remaining body"),
+            (
+                "Before\n\n## **Heading** `wins`\n\nHeading wins again.",
+                "Heading wins",
+                "Before Heading wins again.",
+            ),
+            ("\u{feff}Café 🙂\r\n===\r\n\r\nBody\r\n", "Café 🙂", "Body"),
+            ("\u{feff}\r\n  Café 🙂  \r\nbody\r\n", "Café 🙂", "body"),
+            ("# Only title", "Only title", ""),
+            ("Only title", "Only title", ""),
+            (" \r\n\t", "Untitled", ""),
+            ("# First\n\n# Second\nBody", "First", "# Second Body"),
+        ] {
+            let summary = Summary::from_source(
+                NoteName("example.md".into()),
+                source,
+                false,
+                SystemTime::UNIX_EPOCH,
+            );
+            assert_eq!(summary.title, title, "source {source:?}");
+            assert_eq!(summary.excerpt, excerpt, "source {source:?}");
+            assert_eq!(summary.source.as_bytes(), source.as_bytes());
+            assert!(summary.matches(source));
+        }
+    }
+    #[test]
     fn exact_bytes_survive_restart_and_existing_names_are_retained() {
         let fixture = Fixture::new();
         let bytes = "\u{feff}# 名称\r\n\r\nA🙂\r\n";
@@ -310,6 +369,109 @@ mod tests {
         );
         let new = fixture.store().create().unwrap();
         assert!(Uuid::parse_str(new.name.as_str().trim_end_matches(".md")).is_ok());
+    }
+    fn set_modified(path: &Path, seconds: u64) {
+        File::options()
+            .write(true)
+            .open(path)
+            .unwrap()
+            .set_times(
+                fs::FileTimes::new()
+                    .set_modified(SystemTime::UNIX_EPOCH + std::time::Duration::from_secs(seconds)),
+            )
+            .unwrap();
+    }
+    #[test]
+    fn recent_edits_sort_first_and_equal_times_use_stable_filenames() {
+        let fixture = Fixture::new();
+        for (name, text, modified) in [
+            ("z.md", "# Alphabetically first", 20),
+            ("b.md", "# Zulu", 30),
+            ("a.md", "Plain title\nbody", 30),
+        ] {
+            let path = fixture.0.join(name);
+            fs::write(&path, text).unwrap();
+            set_modified(&path, modified);
+        }
+        let store = fixture.store();
+        let report = store.scan();
+        assert!(report.problems.is_empty());
+        assert_eq!(
+            report
+                .notes
+                .iter()
+                .map(|note| note.name.as_str())
+                .collect::<Vec<_>>(),
+            ["a.md", "b.md", "z.md"]
+        );
+        let oldest = report.notes[2].name.clone();
+        store
+            .save(&oldest, "Edited without a heading\r\n", LoadOrigin::Primary)
+            .unwrap();
+        let report = fixture.store().scan();
+        assert!(report.problems.is_empty());
+        assert_eq!(report.notes[0].name, oldest);
+        assert_eq!(report.notes[0].title, "Edited without a heading");
+        assert_eq!(
+            fs::read(fixture.0.join("z.md")).unwrap(),
+            b"Edited without a heading\r\n"
+        );
+        assert_eq!(report.notes.len(), 3);
+        store.load(&report.notes[1].name).unwrap();
+        assert_eq!(
+            store
+                .scan()
+                .notes
+                .iter()
+                .map(|note| &note.name)
+                .collect::<Vec<_>>(),
+            report
+                .notes
+                .iter()
+                .map(|note| &note.name)
+                .collect::<Vec<_>>()
+        );
+    }
+    #[test]
+    fn recovery_order_uses_loaded_copy_time_and_scan_does_not_change_source() {
+        let fixture = Fixture::new();
+        let store = fixture.store();
+        let original = "\u{feff}\r\n  Café 🙂  \r\nbody\r\n";
+        fs::write(fixture.0.join("plain.md"), original).unwrap();
+        fs::write(fixture.0.join("empty.md"), " \r\n\t").unwrap();
+        fs::write(fixture.0.join("damaged.md"), [0xff]).unwrap();
+        fs::write(fixture.0.join(".recovery/damaged.md"), "Recovered title").unwrap();
+        fs::write(fixture.0.join(".recovery/only.md"), "# Recovery only").unwrap();
+        for (name, seconds) in [
+            ("plain.md", 20),
+            ("empty.md", 10),
+            ("damaged.md", 100),
+            (".recovery/damaged.md", 30),
+            (".recovery/only.md", 40),
+        ] {
+            set_modified(&fixture.0.join(name), seconds);
+        }
+        let report = store.scan();
+        assert!(report.problems.is_empty());
+        assert_eq!(
+            report
+                .notes
+                .iter()
+                .map(|note| (note.name.as_str(), note.title.as_str(), note.recovered))
+                .collect::<Vec<_>>(),
+            [
+                ("only.md", "Recovery only", true),
+                ("damaged.md", "Recovered title", true),
+                ("plain.md", "Café 🙂", false),
+                ("empty.md", "Untitled", false),
+            ]
+        );
+        assert_eq!(
+            fs::read(fixture.0.join("plain.md")).unwrap(),
+            original.as_bytes()
+        );
+        assert_eq!(fs::read(fixture.0.join("damaged.md")).unwrap(), [0xff]);
+        assert!(!fixture.0.join("only.md").exists());
     }
     #[test]
     fn failed_write_sync_and_rename_leave_last_good_primary() {

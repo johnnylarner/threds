@@ -2,6 +2,8 @@
 
 An offline Markdown notebook for iOS, built with Rust and GPUI. The first app slice has a local note library, search, new notes, and a Markdown source editor.
 
+The home screen lists notes by the loaded file's modification time, most recently edited first. Recovery copies use their own modification time. Equal timestamps use stable filename order. Opening a healthy note without editing does not move it. Saving a recovered note repairs the primary file and updates its modification time. The first nonempty Markdown heading supplies the displayed title. Notes without a heading use the first nonempty source line with surrounding whitespace removed, or Untitled when empty. These display rules do not rewrite Markdown or rename files.
+
 Notes stay in the app's `Documents/notes` folder. Existing `.md` filenames stay intact. New notes receive UUID filenames. Editing preserves UTF-8 source outside the replaced range, including BOM and CRLF line endings.
 
 The editor saves after a 400 ms pause, when leaving a note, and when the app becomes inactive or enters the background. "Saved on device" means the save completed. A failed save keeps the note open with a Retry action. Sudden termination can lose changes made during the unsaved interval. Recovery copies hold the previous good version.
