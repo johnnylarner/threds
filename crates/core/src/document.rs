@@ -1,5 +1,7 @@
 use std::ops::Range;
 
+use crate::{InlineFormat, source_decorations};
+
 #[derive(Clone, Debug, PartialEq, Eq)]
 pub struct TextRange(pub Range<usize>);
 
@@ -115,6 +117,125 @@ impl Document {
         self.state.text.replace_range(range.0.clone(), text);
         self.state.selection = TextRange::caret(range.0.start + text.len());
         if self.state != before {
+            self.undo.push(before);
+            self.redo.clear();
+        }
+        true
+    }
+
+    pub fn toggle_format(&mut self, format: InlineFormat) -> bool {
+        self.unmark();
+        let before = self.state.clone();
+        let selected = self.state.selection.0.clone();
+        let decorations = source_decorations(&self.state.text);
+        if let Some(existing) = decorations.iter().find(|decoration| {
+            let mut content = decoration.content.clone();
+            while let Some(inner) = decorations.iter().find(|inner| inner.source == content) {
+                content = inner.content.clone();
+            }
+            decoration.format == format
+                && (content == selected
+                    || decoration.content == selected
+                    || decoration.source == selected)
+        }) {
+            let opening = existing.content.start - existing.source.start;
+            let content = self.state.text[existing.content.clone()].to_owned();
+            self.state
+                .text
+                .replace_range(existing.source.clone(), &content);
+            self.state.selection = if selected == existing.source {
+                TextRange(existing.source.start..existing.source.start + content.len())
+            } else {
+                TextRange(selected.start - opening..selected.end - opening)
+            };
+        } else if let Some(enclosures) = {
+            let matching: Vec<_> = decorations
+                .iter()
+                .filter(|decoration| {
+                    decoration.format == format
+                        && decoration.content.start >= selected.start
+                        && decoration.content.end <= selected.end
+                })
+                .collect();
+            let covers_lines = matching
+                .first()
+                .is_some_and(|first| first.content.start == selected.start)
+                && matching
+                    .last()
+                    .is_some_and(|last| last.content.end == selected.end)
+                && matching.windows(2).all(|pair| {
+                    self.state
+                        .text
+                        .get(pair[0].source.end..pair[1].source.start)
+                        .is_some_and(|between| between.trim().is_empty())
+                });
+            covers_lines.then_some(matching)
+        } {
+            let first = enclosures.first().unwrap();
+            let last = enclosures.last().unwrap();
+            let source = first.source.start..last.source.end;
+            let mut replacement = String::new();
+            let mut cursor = source.start;
+            for enclosure in enclosures {
+                replacement.push_str(&self.state.text[cursor..enclosure.source.start]);
+                replacement.push_str(&self.state.text[enclosure.content.clone()]);
+                cursor = enclosure.source.end;
+            }
+            let end = source.start + replacement.len();
+            self.state.text.replace_range(source.clone(), &replacement);
+            self.state.selection = TextRange(source.start..end);
+        } else {
+            let mut replacement = String::new();
+            let mut first = None;
+            let mut last = 0;
+            for line in self.state.text[selected.clone()].split_inclusive('\n') {
+                let content = line.trim_matches(char::is_whitespace);
+                if content.is_empty() {
+                    replacement.push_str(line);
+                    continue;
+                }
+                let start = line.find(content).unwrap();
+                let (mut open, mut close) = format.delimiters();
+                let candidate = format!(
+                    "{}{}{}{}{}",
+                    &self.state.text[..selected.start],
+                    open,
+                    content,
+                    close,
+                    &self.state.text[selected.end..]
+                );
+                let candidate_start = selected.start + open.len();
+                if !source_decorations(&candidate).iter().any(|decoration| {
+                    decoration.format == format
+                        && decoration.content == (candidate_start..candidate_start + content.len())
+                }) {
+                    (open, close) = format.html_delimiters();
+                }
+                replacement.push_str(&line[..start]);
+                replacement.push_str(open);
+                first.get_or_insert(replacement.len());
+                replacement.push_str(content);
+                last = replacement.len();
+                replacement.push_str(close);
+                replacement.push_str(&line[start + content.len()..]);
+            }
+            if selected.is_empty() {
+                let (open, close) = format.html_delimiters();
+                replacement.push_str(open);
+                first = Some(open.len());
+                last = open.len();
+                replacement.push_str(close);
+            }
+            let Some(first) = first else {
+                return false;
+            };
+            self.state
+                .text
+                .replace_range(selected.clone(), &replacement);
+            self.state.selection = TextRange(selected.start + first..selected.start + last);
+        }
+        if self.state != before {
+            self.revision += 1;
             self.undo.push(before);
             self.redo.clear();
         }

@@ -205,9 +205,9 @@ impl NoteStore {
             }
         }
     }
-    pub fn create(&self) -> io::Result<LoadedNote> {
+    pub fn create(&self, initial_source: &str) -> io::Result<LoadedNote> {
         let name = NoteName(format!("{}.md", Uuid::new_v4()));
-        self.save(&name, "", LoadOrigin::Primary)?;
+        self.save(&name, initial_source, LoadOrigin::Primary)?;
         self.load(&name)
     }
     pub fn save(&self, name: &NoteName, text: &str, origin: LoadOrigin) -> io::Result<()> {
@@ -367,9 +367,22 @@ mod tests {
             fixture.store().load(&name).unwrap().source.as_bytes(),
             bytes.as_bytes()
         );
-        let new = fixture.store().create().unwrap();
+        let new = fixture.store().create("").unwrap();
         assert!(Uuid::parse_str(new.name.as_str().trim_end_matches(".md")).is_ok());
     }
+    #[test]
+    fn initial_source_is_persisted_before_new_note_is_returned() {
+        let fixture = Fixture::new();
+        let store = fixture.store();
+        let source = "# 16 November 2026\n\n";
+        let created = store.create(source).unwrap();
+        assert_eq!(created.source, source);
+        assert_eq!(fixture.store().load(&created.name).unwrap().source, source);
+        let mut document = crate::Document::new(&created.source);
+        document.undo();
+        assert_eq!(document.text(), source);
+    }
+
     fn set_modified(path: &Path, seconds: u64) {
         File::options()
             .write(true)
@@ -478,7 +491,7 @@ mod tests {
         for fault in [SaveStep::Write, SaveStep::Sync, SaveStep::Rename] {
             let fixture = Fixture::new();
             let store = fixture.store();
-            let note = store.create().unwrap();
+            let note = store.create("").unwrap();
             store
                 .save(&note.name, "last good", LoadOrigin::Primary)
                 .unwrap();
@@ -501,7 +514,7 @@ mod tests {
     fn directory_sync_failure_is_reported_after_atomic_replacement() {
         let fixture = Fixture::new();
         let store = fixture.store();
-        let note = store.create().unwrap();
+        let note = store.create("").unwrap();
         let result = store.save_with(
             &note.name,
             "visible but not certified durable",
@@ -524,7 +537,7 @@ mod tests {
     fn recovery_only_notes_are_discovered_and_bad_primary_is_preserved_on_repair() {
         let fixture = Fixture::new();
         let store = fixture.store();
-        let note = store.create().unwrap();
+        let note = store.create("").unwrap();
         store
             .save(&note.name, "first🙂", LoadOrigin::Primary)
             .unwrap();

@@ -1,6 +1,8 @@
 mod document;
+mod formatting;
 mod store;
 pub use document::{Document, TextRange};
+pub use formatting::{InlineFormat, SourceDecoration, source_decorations};
 pub use store::{LoadOrigin, LoadedNote, NoteName, NoteStore, ScanReport, Summary};
 
 pub fn title(source: &str) -> String {

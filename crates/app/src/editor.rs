@@ -1,5 +1,27 @@
 use gpui::{prelude::*, *};
-use std::ops::Range;
+use std::{cell::RefCell, ops::Range, rc::Rc};
+
+#[derive(Clone, Copy)]
+pub enum EditorCommand {
+    Format(threds_core::InlineFormat),
+    Insert(&'static str),
+}
+
+impl EditorCommand {
+    pub fn toolbar() -> [(&'static str, &'static str, Self); 8] {
+        use threds_core::InlineFormat::*;
+        [
+            ("B", "Bold", Self::Format(Bold)),
+            ("I", "Italic", Self::Format(Italic)),
+            ("S̶", "Strikethrough", Self::Format(Strikethrough)),
+            ("U̲", "Underline", Self::Format(Underline)),
+            (",", "Insert comma", Self::Insert(",")),
+            (".", "Insert period", Self::Insert(".")),
+            ("’", "Insert apostrophe", Self::Insert("’")),
+            ("—", "Insert dash", Self::Insert("—")),
+        ]
+    }
+}
 
 pub struct EditorView {
     pub focus: FocusHandle,
@@ -46,8 +68,26 @@ actions!(
 
 struct Row {
     bytes: TextRange,
-    line: ShapedLine,
+    line: WrappedLine,
     bounds: Bounds<Pixels>,
+    line_height: Pixels,
+}
+
+impl Row {
+    fn visual_ranges(&self) -> Vec<Range<usize>> {
+        let starts = std::iter::once(0).chain(
+            self.line
+                .wrap_boundaries
+                .iter()
+                .map(|boundary| self.line.runs()[boundary.run_ix].glyphs[boundary.glyph_ix].index),
+        );
+        let mut starts = starts.peekable();
+        let mut ranges = Vec::new();
+        while let Some(start) = starts.next() {
+            ranges.push(start..starts.peek().copied().unwrap_or(self.line.len()));
+        }
+        ranges
+    }
 }
 
 struct Layout {
@@ -57,29 +97,47 @@ struct Layout {
 
 impl Layout {
     fn rectangles(&self, range: &TextRange) -> Vec<Bounds<Pixels>> {
-        self.rows
-            .iter()
-            .filter_map(|row| {
-                let start = range.0.start.max(row.bytes.0.start);
-                let end = range.0.end.min(row.bytes.0.end);
+        let mut rectangles = Vec::new();
+        for row in &self.rows {
+            let visual = row.visual_ranges();
+            for (index, segment) in visual.iter().enumerate() {
+                let bytes = row.bytes.0.start + segment.start..row.bytes.0.start + segment.end;
+                let start = range.0.start.max(bytes.start);
+                let end = range.0.end.min(bytes.end);
                 let intersects = if range.0.is_empty() {
-                    range.0.start >= row.bytes.0.start && range.0.start <= row.bytes.0.end
+                    range.0.start >= bytes.start
+                        && (range.0.start < bytes.end
+                            || (index + 1 == visual.len() && range.0.start == bytes.end))
                 } else {
-                    start <= end
-                        && range.0.start <= row.bytes.0.end
-                        && range.0.end > row.bytes.0.start
+                    start < end
+                        || (range.0.start <= bytes.end
+                            && range.0.end > bytes.end
+                            && index + 1 == visual.len())
                 };
                 if !intersects {
-                    return None;
+                    continue;
                 }
-                let left = row.line.x_for_index(start - row.bytes.0.start);
-                let right = row.line.x_for_index(end - row.bytes.0.start);
-                Some(Bounds::new(
-                    point(row.bounds.left() + left, row.bounds.top()),
-                    size((right - left).max(px(2.)), row.bounds.size.height),
-                ))
-            })
-            .collect()
+                let origin_x = row.line.unwrapped_layout.x_for_index(segment.start);
+                let left = row
+                    .line
+                    .unwrapped_layout
+                    .x_for_index(start - row.bytes.0.start)
+                    - origin_x;
+                let right = row
+                    .line
+                    .unwrapped_layout
+                    .x_for_index(end - row.bytes.0.start)
+                    - origin_x;
+                rectangles.push(Bounds::new(
+                    point(
+                        row.bounds.left() + left,
+                        row.bounds.top() + row.line_height * index,
+                    ),
+                    size((right - left).max(px(2.)), row.line_height),
+                ));
+            }
+        }
+        rectangles
     }
 
     fn index(&self, position: Point<Pixels>) -> Option<usize> {
@@ -88,11 +146,41 @@ impl Layout {
             .iter()
             .find(|row| position.y < row.bounds.bottom())
             .or_else(|| self.rows.last())?;
-        Some(row.bytes.0.start + row.line.closest_index_for_x(position.x - row.bounds.left()))
+        if position.y >= row.bounds.bottom() {
+            return Some(row.bytes.0.end);
+        }
+        let local = position - row.bounds.origin;
+        let index = row
+            .line
+            .closest_index_for_position(point(local.x, local.y.max(px(0.))), row.line_height);
+        Some(row.bytes.0.start + index.unwrap_or_else(|index| index).min(row.line.len()))
     }
 }
 
 impl AppSession {
+    pub fn editor_command(
+        &mut self,
+        command: EditorCommand,
+        window: &mut Window,
+        cx: &mut Context<Self>,
+    ) {
+        if !self.editing_note() {
+            return;
+        }
+        match command {
+            EditorCommand::Format(format) => {
+                self.input_mut().toggle_format(format);
+            }
+            EditorCommand::Insert(text) => {
+                self.input_mut().unmark();
+                self.input_mut().replace(None, text);
+            }
+        }
+        self.changed(window, cx);
+        window.focus(&self.editor.focus, cx);
+        window.request_virtual_keyboard();
+    }
+
     pub fn bind_keys(cx: &mut App) {
         cx.bind_keys([
             KeyBinding::new("backspace", Backspace, Some("ThredsEditor")),
@@ -336,9 +424,13 @@ impl AppSession {
             .size_full()
             .min_h_0()
             .w_full()
-            .overflow_scroll()
+            .overflow_y_scroll()
             .track_scroll(&self.editor.scroll)
-            .bg(palette.surface)
+            .bg(if self.editing_note() {
+                palette.background
+            } else {
+                palette.surface
+            })
             .key_context("ThredsEditor")
             .track_focus(&self.editor.focus)
             .cursor(CursorStyle::IBeam)
@@ -431,7 +523,7 @@ struct EditorText {
 }
 
 impl Element for EditorText {
-    type RequestLayoutState = Vec<(TextRange, ShapedLine)>;
+    type RequestLayoutState = Rc<RefCell<Vec<Row>>>;
     type PrepaintState = ();
     fn id(&self) -> Option<ElementId> {
         None
@@ -447,43 +539,112 @@ impl Element for EditorText {
         cx: &mut App,
     ) -> (LayoutId, Self::RequestLayoutState) {
         let editor = self.editor.read(cx);
+        let text = editor.input().text().to_owned();
+        let editing = editor.editing_note();
+        let decorations = if editing {
+            threds_core::source_decorations(&text)
+        } else {
+            vec![]
+        };
         let style = window.text_style();
         let font_size = style.font_size.to_pixels(window.rem_size());
-        let mut start = 0;
-        let mut width = window.fully_visible_bounds().size.width - px(26.);
-        let lines = editor
-            .input()
-            .text()
-            .split('\n')
-            .map(|text| {
-                let bytes = TextRange(start..start + text.len());
-                start += text.len() + 1;
-                let run = TextRun {
-                    len: text.len(),
-                    font: style.font(),
-                    color: style.color,
-                    background_color: None,
-                    underline: None,
-                    strikethrough: None,
-                };
-                let line = window.text_system().shape_line(
-                    text.to_owned().into(),
-                    font_size,
-                    &[run],
-                    None,
-                );
-                width = width.max(line.width + px(8.));
-                (bytes, line)
-            })
-            .collect::<Vec<_>>();
-        let mut style = Style::default();
-        style.flex_shrink = 0.;
-        style.size = size(
-            width.into(),
-            (window.line_height() * lines.len() as f32).into(),
-        );
-        (window.request_layout(style, [], cx), lines)
+        let palette = crate::app::Palette::for_window(window);
+        let lines = Rc::new(RefCell::new(Vec::new()));
+        let measured = lines.clone();
+        let mut layout_style = Style::default();
+        layout_style.flex_shrink = 0.;
+        layout_style.size.width = relative(1.).into();
+        let layout =
+            window.request_measured_layout(layout_style, move |known, available, window, _| {
+                let width = known
+                    .width
+                    .or(match available.width {
+                        AvailableSpace::Definite(width) => Some(width),
+                        _ => None,
+                    })
+                    .unwrap_or(px(320.))
+                    .max(px(1.));
+                let mut rows = Vec::new();
+                let mut start = 0;
+                let mut height = px(0.);
+                for (index, paragraph) in text.split('\n').enumerate() {
+                    let title = editing && index == 0 && paragraph.starts_with("# ");
+                    let line_height = if title { px(24.) } else { px(30.) };
+                    let mut runs: Vec<TextRun> = Vec::new();
+                    for (local, ch) in paragraph.char_indices() {
+                        let byte = start + local;
+                        let mut run = TextRun {
+                            len: ch.len_utf8(),
+                            font: style.font(),
+                            color: if title { palette.muted } else { style.color },
+                            background_color: None,
+                            underline: None,
+                            strikethrough: None,
+                        };
+                        for decoration in &decorations {
+                            if decoration.content.contains(&byte) {
+                                match decoration.format {
+                                    threds_core::InlineFormat::Bold => {
+                                        run.font.weight = FontWeight::BOLD
+                                    }
+                                    threds_core::InlineFormat::Italic => {
+                                        run.font.style = FontStyle::Italic
+                                    }
+                                    threds_core::InlineFormat::Underline => {
+                                        run.underline = Some(UnderlineStyle {
+                                            thickness: px(1.),
+                                            ..Default::default()
+                                        })
+                                    }
+                                    threds_core::InlineFormat::Strikethrough => {
+                                        run.strikethrough = Some(StrikethroughStyle {
+                                            thickness: px(1.),
+                                            ..Default::default()
+                                        })
+                                    }
+                                }
+                            } else if decoration.source.contains(&byte) {
+                                run.color = palette.muted;
+                            }
+                        }
+                        if let Some(previous) = runs.last_mut().filter(|previous| {
+                            previous.font == run.font
+                                && previous.color == run.color
+                                && previous.underline == run.underline
+                                && previous.strikethrough == run.strikethrough
+                        }) {
+                            previous.len += run.len;
+                        } else {
+                            runs.push(run);
+                        }
+                    }
+                    let line = window
+                        .text_system()
+                        .shape_text(
+                            paragraph.to_owned().into(),
+                            if title { px(14.) } else { font_size },
+                            &runs,
+                            editing.then_some(width),
+                            None,
+                        )
+                        .expect("source text shapes")
+                        .remove(0);
+                    let row_height = line.size(line_height).height;
+                    rows.push(Row {
+                        bytes: TextRange(start..start + paragraph.len()),
+                        line,
+                        bounds: Bounds::new(point(px(0.), height), size(width, row_height)),
+                        line_height,
+                    });
+                    height += row_height;
+                    start += paragraph.len() + 1;
+                }
+                *measured.borrow_mut() = rows;
+                size(width, height)
+            });
+        (layout, lines)
     }
+
     fn prepaint(
         &mut self,
         _: Option<&GlobalElementId>,
@@ -494,18 +655,11 @@ impl Element for EditorText {
         cx: &mut App,
     ) {
         let rows = lines
+            .borrow_mut()
             .drain(..)
-            .enumerate()
-            .map(|(i, (bytes, line))| Row {
-                bytes,
-                line,
-                bounds: Bounds::new(
-                    point(
-                        bounds.left() + px(4.),
-                        bounds.top() + window.line_height() * i as f32,
-                    ),
-                    size(bounds.size.width, window.line_height()),
-                ),
+            .map(|mut row| {
+                row.bounds.origin += bounds.origin;
+                row
             })
             .collect();
         self.editor.update(cx, |editor, cx| {
@@ -591,7 +745,7 @@ impl Element for EditorText {
                 row.line
                     .paint(
                         row.bounds.origin,
-                        row.bounds.size.height,
+                        row.line_height,
                         TextAlign::Left,
                         None,
                         window,
