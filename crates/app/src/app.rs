@@ -38,6 +38,11 @@ impl Palette {
     }
 }
 
+enum SearchVisibility {
+    Collapsed,
+    Visible,
+}
+
 enum SaveState {
     Saved(u64),
     Unsaved,
@@ -73,6 +78,7 @@ pub struct AppSession {
     store: Option<NoteStore>,
     active: Option<ActiveNote>,
     query: Document,
+    search: SearchVisibility,
     summaries: Vec<Summary>,
     problems: Vec<String>,
     error: Option<String>,
@@ -102,6 +108,7 @@ impl AppSession {
             store: None,
             active: None,
             query: Document::new(""),
+            search: SearchVisibility::Collapsed,
             summaries: vec![],
             problems: vec![],
             error: None,
@@ -364,13 +371,51 @@ impl Render for AppSession {
                     .child(div().text_size(px(32.)).child("Threds"))
                     .child(
                         div()
-                            .id("new")
-                            .py_2()
-                            .pl_4()
-                            .text_size(px(17.))
-                            .text_color(p.accent)
-                            .child("+ New")
-                            .on_click(cx.listener(|this, _, w, cx| this.new_note(w, cx))),
+                            .id("search-toggle")
+                            .aria_label("Search notes")
+                            .size(px(44.))
+                            .flex()
+                            .items_center()
+                            .justify_center()
+                            .child(
+                                canvas(
+                                    |_, _, _| (),
+                                    move |bounds, _, window, _| {
+                                        let origin = bounds.origin;
+                                        let mut icon = PathBuilder::stroke(px(2.));
+                                        icon.move_to(origin + point(px(17.), px(10.)));
+                                        icon.arc_to(
+                                            point(px(7.), px(7.)),
+                                            px(0.),
+                                            true,
+                                            true,
+                                            origin + point(px(3.), px(10.)),
+                                        );
+                                        icon.arc_to(
+                                            point(px(7.), px(7.)),
+                                            px(0.),
+                                            true,
+                                            true,
+                                            origin + point(px(17.), px(10.)),
+                                        );
+                                        icon.move_to(origin + point(px(15.), px(15.)));
+                                        icon.line_to(origin + point(px(22.), px(22.)));
+                                        if let Ok(path) = icon.build() {
+                                            window.paint_path(path, p.accent);
+                                        }
+                                    },
+                                )
+                                .size(px(24.)),
+                            )
+                            .on_click(cx.listener(|this, _, window, cx| {
+                                this.search = SearchVisibility::Visible;
+                                let focus = this.editor.focus.clone();
+                                window.on_next_frame(move |window, cx| {
+                                    window.focus(&focus, cx);
+                                    window.request_virtual_keyboard();
+                                });
+                                cx.notify();
+                            })),
                     ),
             );
             body = body.child(
@@ -378,12 +423,6 @@ impl Render for AppSession {
                     .text_size(px(12.))
                     .text_color(p.muted)
                     .child("On this device · GitHub not connected"),
-            );
-            body = body.child(
-                div()
-                    .text_size(px(12.))
-                    .text_color(p.muted)
-                    .child("Search notes"),
             );
         }
         if let Some(error) = &self.error {
@@ -412,17 +451,56 @@ impl Render for AppSession {
                     .child("Markdown source · Swipe sideways for long lines"),
             );
         } else {
-            body = body.child(
-                div()
-                    .h(px(46.))
-                    .flex_none()
-                    .px_2()
-                    .py_1()
-                    .bg(p.surface)
-                    .border_1()
-                    .border_color(p.line)
-                    .child(self.editor_element(window, cx)),
-            );
+            if matches!(self.search, SearchVisibility::Visible) {
+                body = body.child(
+                    div()
+                        .flex()
+                        .items_center()
+                        .gap_3()
+                        .child(
+                            div()
+                                .flex_1()
+                                .min_w_0()
+                                .flex()
+                                .flex_col()
+                                .gap_1()
+                                .child(
+                                    div()
+                                        .text_size(px(12.))
+                                        .text_color(p.muted)
+                                        .child("Search notes"),
+                                )
+                                .child(
+                                    div()
+                                        .h(px(46.))
+                                        .flex_none()
+                                        .px_2()
+                                        .py_1()
+                                        .bg(p.surface)
+                                        .border_1()
+                                        .border_color(p.line)
+                                        .child(self.editor_element(window, cx)),
+                                ),
+                        )
+                        .child(
+                            div()
+                                .id("cancel-search")
+                                .min_h(px(44.))
+                                .flex()
+                                .items_center()
+                                .text_color(p.accent)
+                                .child("Cancel")
+                                .on_click(cx.listener(|this, _, window, cx| {
+                                    window.blur(cx);
+                                    window.dismiss_virtual_keyboard();
+                                    this.query = Document::new("");
+                                    this.search = SearchVisibility::Collapsed;
+                                    this.editor.reset(cx);
+                                    cx.notify();
+                                })),
+                        ),
+                );
+            }
             let query = self.query.text();
             let rows = self
                 .summaries
@@ -439,7 +517,7 @@ impl Render for AppSession {
             if rows.is_empty() {
                 list = list.child(div().py_6().text_color(p.muted).child(
                     if query.trim().is_empty() {
-                        "A place for your next thought. Tap New to begin."
+                        "A place for your next thought. Tap New thred to begin."
                     } else {
                         "No notes match your search."
                     },
@@ -453,8 +531,13 @@ impl Render for AppSession {
                         .py_4()
                         .border_b_1()
                         .border_color(p.line)
-                        .child(div().text_size(px(19.)).child(row.title))
-                        .child(div().mt_1().text_size(px(14.)).text_color(p.muted).child(
+                        .child(
+                            div()
+                                .text_size(px(14.))
+                                .text_color(p.muted)
+                                .child(row.title),
+                        )
+                        .child(div().mt_2().text_size(px(18.)).line_height(px(27.)).child(
                             if row.excerpt.is_empty() {
                                 "No body text".into()
                             } else {
@@ -495,6 +578,22 @@ impl Render for AppSession {
                         .on_click(cx.listener(|this, _, _, cx| this.retry(cx))),
                 );
             }
+            body = body.child(
+                div().flex().justify_end().flex_none().pt_2().child(
+                    div()
+                        .id("new")
+                        .min_h(px(52.))
+                        .px_5()
+                        .rounded_full()
+                        .flex()
+                        .items_center()
+                        .bg(p.accent)
+                        .text_color(p.background)
+                        .text_size(px(17.))
+                        .child("+ New thred")
+                        .on_click(cx.listener(|this, _, window, cx| this.new_note(window, cx))),
+                ),
+            );
         }
         div()
             .size_full()
