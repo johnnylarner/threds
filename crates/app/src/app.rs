@@ -456,7 +456,7 @@ impl Render for AppSession {
                         .child(div().text_size(px(19.)).child(row.title))
                         .child(div().mt_1().text_size(px(14.)).text_color(p.muted).child(
                             if row.excerpt.is_empty() {
-                                "Empty note".into()
+                                "No body text".into()
                             } else {
                                 row.excerpt
                             },

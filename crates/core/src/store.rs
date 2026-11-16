@@ -35,11 +35,17 @@ impl Summary {
         recovered: bool,
         modified: SystemTime,
     ) -> Self {
+        let title = crate::selected_title(source);
+        let (before, after) = title
+            .span
+            .map(|span| (&source[..span.start], &source[span.end..]))
+            .unwrap_or((source, ""));
         Self {
-            title: crate::title(source),
-            excerpt: source
+            title: title.text,
+            excerpt: before
                 .trim_start_matches('\u{feff}')
                 .split_whitespace()
+                .chain(after.split_whitespace())
                 .collect::<Vec<_>>()
                 .join(" ")
                 .chars()

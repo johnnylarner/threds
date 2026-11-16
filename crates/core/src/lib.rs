@@ -4,34 +4,57 @@ pub use document::{Document, TextRange};
 pub use store::{LoadOrigin, LoadedNote, NoteName, NoteStore, ScanReport, Summary};
 
 pub fn title(source: &str) -> String {
+    selected_title(source).text
+}
+
+struct SelectedTitle {
+    text: String,
+    span: Option<std::ops::Range<usize>>,
+}
+
+fn selected_title(source: &str) -> SelectedTitle {
     use pulldown_cmark::{Event, Parser, Tag, TagEnd};
+    let parsed_source = source.trim_start_matches('\u{feff}');
+    let offset = source.len() - parsed_source.len();
     let mut heading = None;
-    for event in Parser::new(source.trim_start_matches('\u{feff}')) {
+    for (event, range) in Parser::new(parsed_source).into_offset_iter() {
         match event {
-            Event::Start(Tag::Heading { .. }) => heading = Some(String::new()),
+            Event::Start(Tag::Heading { .. }) => {
+                heading = Some((String::new(), offset + range.start))
+            }
             Event::Text(text) | Event::Code(text) if heading.is_some() => {
-                heading.as_mut().unwrap().push_str(&text)
+                heading.as_mut().unwrap().0.push_str(&text)
             }
             Event::SoftBreak | Event::HardBreak if heading.is_some() => {
-                heading.as_mut().unwrap().push(' ')
+                heading.as_mut().unwrap().0.push(' ')
             }
             Event::End(TagEnd::Heading(_)) => {
-                let title = heading.take().unwrap();
+                let (title, start) = heading.take().unwrap();
                 if !title.trim().is_empty() {
-                    return title.trim().into();
+                    return SelectedTitle {
+                        text: title.trim().into(),
+                        span: Some(start..offset + range.end),
+                    };
                 }
             }
             _ => {}
         }
     }
 
-    source
-        .trim_start_matches('\u{feff}')
-        .lines()
-        .map(str::trim)
-        .find(|line| !line.is_empty())
-        .unwrap_or("Untitled")
-        .into()
+    let mut start = offset;
+    for line in parsed_source.split_inclusive('\n') {
+        if !line.trim().is_empty() {
+            return SelectedTitle {
+                text: line.trim().into(),
+                span: Some(start..start + line.len()),
+            };
+        }
+        start += line.len();
+    }
+    SelectedTitle {
+        text: "Untitled".into(),
+        span: None,
+    }
 }
 
 #[cfg(test)]
