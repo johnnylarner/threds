@@ -8,7 +8,9 @@ Notes stay in the app's `Documents/notes` folder. Existing `.md` filenames stay 
 
 The editor saves after a 400 ms pause, when leaving a note, and when the app becomes inactive or enters the background. "Saved on device" means the save completed. A failed save keeps the note open with a Retry action. Sudden termination can lose changes made during the unsaved interval. Recovery copies hold the previous good version.
 
-Long lines scroll horizontally. Line wrapping, rendered Markdown, GitHub sync, and physical-device signing and validation remain deferred.
+The editor wraps text across one writing page. Bold, italic, strikethrough, and underline controls style selected text or prepare an empty pair at the caret. Punctuation controls insert at the current selection. Markdown stays authoritative and its syntax remains editable. Supported inline HTML preserves formatting when Markdown delimiters would be ambiguous. New notes start with a small local-date heading and the caret in the body; existing notes keep their source.
+
+Physical-device installation and launch have been verified. Broader device input checks, native toolbar interaction, and functional review video remain pending. GitHub sync remains deferred.
 
 ## Run the app
 

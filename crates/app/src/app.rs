@@ -1,4 +1,4 @@
-use crate::editor::EditorView;
+use crate::editor::{EditorCommand, EditorView};
 use gpui::{prelude::*, *};
 use std::{path::PathBuf, time::Duration};
 use threds_core::{Document, LoadOrigin, LoadedNote, NoteName, NoteStore, Summary};
@@ -247,10 +247,12 @@ impl AppSession {
         let Some(store) = &self.store else {
             return;
         };
-        match store.create() {
+        match new_note_source().and_then(|source| store.create(&source)) {
             Ok(note) => {
                 window.blur(cx);
                 self.active = Some(ActiveNote::loaded(note));
+                let end = self.input().text().encode_utf16().count();
+                self.input_mut().select(end..end);
                 self.error = None;
                 self.editor.reset(cx);
                 window.focus(&self.editor.focus, cx);
@@ -288,7 +290,6 @@ impl Render for AppSession {
             .gap_3()
             .text_color(p.text);
         if let Some(note) = &self.active {
-            let title = threds_core::title(note.document.text());
             let status = match &note.save {
                 SaveState::Saved(_) => "Saved on device",
                 SaveState::Unsaved => "Unsaved",
@@ -325,7 +326,6 @@ impl Render for AppSession {
                             .on_click(cx.listener(Self::leave_note_click)),
                     ),
             );
-            body = body.child(div().text_size(px(22.)).child(title));
             body = body.child(
                 div()
                     .flex()
@@ -444,12 +444,31 @@ impl Render for AppSession {
                     .min_h_0()
                     .child(self.editor_element(window, cx)),
             );
-            body = body.child(
-                div()
-                    .text_size(px(11.))
-                    .text_color(p.muted)
-                    .child("Markdown source · Swipe sideways for long lines"),
-            );
+            let mut toolbar = div()
+                .id("writing-tools")
+                .flex()
+                .flex_none()
+                .overflow_x_scroll()
+                .border_t_1()
+                .border_color(p.line);
+            for (label, title, command) in EditorCommand::toolbar() {
+                toolbar = toolbar.child(
+                    div()
+                        .id(title)
+                        .aria_label(title)
+                        .min_w(px(44.))
+                        .h(px(44.))
+                        .flex()
+                        .items_center()
+                        .justify_center()
+                        .text_size(px(18.))
+                        .child(label)
+                        .on_click(cx.listener(move |this, _, window, cx| {
+                            this.editor_command(command, window, cx)
+                        })),
+                );
+            }
+            body = body.child(toolbar);
         } else {
             if matches!(self.search, SearchVisibility::Visible) {
                 body = body.child(
@@ -605,5 +624,46 @@ impl Render for AppSession {
 impl AppSession {
     fn leave_note_click(&mut self, _: &ClickEvent, window: &mut Window, cx: &mut Context<Self>) {
         self.leave_note(window, cx);
+    }
+}
+
+fn new_note_source() -> std::io::Result<String> {
+    let now = unsafe { libc::time(std::ptr::null_mut()) };
+    let mut local = std::mem::MaybeUninit::<libc::tm>::uninit();
+    if unsafe { libc::localtime_r(&now, local.as_mut_ptr()) }.is_null() {
+        return Err(std::io::Error::other("Could not read the local date"));
+    }
+    let local = unsafe { local.assume_init() };
+    Ok(note_source_for_date(
+        local.tm_year + 1900,
+        local.tm_mon as usize,
+        local.tm_mday,
+    ))
+}
+
+fn note_source_for_date(year: i32, month: usize, day: i32) -> String {
+    let months = [
+        "January",
+        "February",
+        "March",
+        "April",
+        "May",
+        "June",
+        "July",
+        "August",
+        "September",
+        "October",
+        "November",
+        "December",
+    ];
+    format!("# {day} {} {year}\n\n", months[month])
+}
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+    #[::core::prelude::v1::test]
+    fn new_note_source_contains_one_date_heading_and_body_space() {
+        assert_eq!(note_source_for_date(2026, 10, 16), "# 16 November 2026\n\n");
     }
 }
