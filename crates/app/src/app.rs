@@ -281,7 +281,7 @@ impl Render for AppSession {
             .gap_3()
             .text_color(p.text);
         if let Some(note) = &self.active {
-            let title = threds_core::title(note.document.text(), note.name.as_str());
+            let title = threds_core::title(note.document.text());
             let status = match &note.save {
                 SaveState::Saved(_) => "Saved on device",
                 SaveState::Unsaved => "Unsaved",

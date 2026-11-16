@@ -3,7 +3,7 @@ mod store;
 pub use document::{Document, TextRange};
 pub use store::{LoadOrigin, LoadedNote, NoteName, NoteStore, ScanReport, Summary};
 
-pub fn title(source: &str, fallback: &str) -> String {
+pub fn title(source: &str) -> String {
     use pulldown_cmark::{Event, Parser, Tag, TagEnd};
     let mut heading = None;
     for event in Parser::new(source.trim_start_matches('\u{feff}')) {
@@ -25,7 +25,13 @@ pub fn title(source: &str, fallback: &str) -> String {
         }
     }
 
-    fallback.trim_end_matches(".md").into()
+    source
+        .trim_start_matches('\u{feff}')
+        .lines()
+        .map(str::trim)
+        .find(|line| !line.is_empty())
+        .unwrap_or("Untitled")
+        .into()
 }
 
 #[cfg(test)]
@@ -34,19 +40,28 @@ mod summary_tests {
     #[test]
     fn headings_are_display_only_and_skip_fences() {
         assert_eq!(
-            title(
-                "\u{feff}```md\r\n# Hidden\r\n```\r\nReal title\r\n===\r\n",
-                "old.md"
-            ),
+            title("\u{feff}```md\r\n# Hidden\r\n```\r\nReal title\r\n===\r\n"),
             "Real title"
         );
-        assert_eq!(
-            title("~~~\n# Hidden\n~~~\n### Actual ###\n", "old.md"),
-            "Actual"
-        );
-        assert_eq!(title("# C#", "old.md"), "C#");
-        assert_eq!(title("    indented\n---\n", "old.md"), "old");
-        assert_eq!(title("#nospace\nbody\n", "old.md"), "old");
+        assert_eq!(title("~~~\n# Hidden\n~~~\n### Actual ###\n"), "Actual");
+        assert_eq!(title("# C#"), "C#");
+        assert_eq!(title("    indented\n---\n"), "indented");
+        assert_eq!(title("#nospace\nbody\n"), "#nospace");
+    }
+    #[test]
+    fn titles_use_headings_then_nonempty_lines_then_untitled() {
+        for (source, expected) in [
+            ("", "Untitled"),
+            ("\u{feff} \r\n\t\r\n", "Untitled"),
+            ("First line\nsecond line", "First line"),
+            ("\u{feff}\r\n  Café 🙂e\u{301}  \r\nbody", "Café 🙂e\u{301}"),
+            ("First line\n\n## **Heading** `wins`\n", "Heading wins"),
+            ("# First\n\n# Second", "First"),
+            ("# \n\nPlain title", "#"),
+            ("# \n\n## Actual", "Actual"),
+        ] {
+            assert_eq!(title(source), expected, "source {source:?}");
+        }
     }
     #[test]
     fn edits_preserve_bom_crlf_and_untouched_bytes() {
